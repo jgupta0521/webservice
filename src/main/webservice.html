@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>AKQA Web Service Assignment</title>
+<meta name="description"
+	content="An interactive getting started guide for Brackets.">
+<!--<link rel="stylesheet" href="main.css">-->
+</head>
+<body>
+
+	<h1>AKQA Web Service Assignment</h1>
+	<h2>Please enter the following details:</h2>
+
+	<label for="name">Name:</label>
+	<textarea id="name" name="name" rows="1"></textarea>
+	<br>
+	<label for="numbers">Numbers:</label>
+	<textarea id="numbers" name="numbers" rows="1" onblur="return validateDecimal(this);"></textarea>
+	<br>
+	<br>
+	<button type="submit" value="Submit">Submit</button>
+
+	<p>Click the "Submit" button to display the input data".</p>
+
+	<div id="displayName"></div>
+	<div id="displayNumber"></div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+		crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		function validateDecimal(element) {
+            var regex = /^\d+(\.\d{1,2})?$/;
+            if (!regex.test(element.value)) {
+                alert("please enter decimal number upto 2 places");
+            }
+        }
+		$(document).ready(function() {
+			$("button").click(function() {
+				// Fetching Form data
+				var displayName = $("#name").val();
+				var displayNumbers = $("#numbers").val();
+				console.log(displayName);
+				console.log(displayNumbers);
+
+				$.ajax({
+					url : "http://localhost:8080/convertNumbersToWord",
+					type : "GET",
+					data : {
+						name : displayName,
+						number : displayNumbers
+					}, // multiple data we want to send
+					success : function(response) {
+						console.log(response);
+						var myMessage = response;
+						var jsonData = JSON.parse(myMessage);
+						for (var i = 0; i < jsonData.length; i++) {
+							console.log(jsonData[i]);
+							if (jsonData[i].startsWith("$")) {
+								$("#displayNumber").html(jsonData[i]);
+							}
+							$("#displayName").html(jsonData[i]);
+						}
+					}
+				}).done(function() {
+					console.log("Success.");
+				}).fail(function() {
+					console.log("An error has occurred.");
+				}).always(function() {
+					console.log("Complete.");
+				});
+
+			});
+		});
+	</script>
+</body>
+</html>
